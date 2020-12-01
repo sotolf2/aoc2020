@@ -25,6 +25,8 @@ let part1 nums =
     let (x, y) = searchSum nums
     printfn "Part1: %d" (x*y)
 
+// Dead code, but I keep it here, it might come in handy for later
+// days
 let combinations sz lst =
     let rec choose lo n arr =
         match n with
@@ -34,6 +36,8 @@ let combinations sz lst =
                 yield arr.[j] :: ks]
     choose 0 sz (Array.ofList lst)
 
+// Dead code, but I keep it here, it might come in handy for later
+// days
 let searchSumSz sz lst =
     let rec loop lst =
         match lst with
@@ -43,9 +47,15 @@ let searchSumSz sz lst =
             loop tl
     loop (combinations sz lst)
 
+let sumOf3 lst =
+    let res = [for x in lst do
+               for y in lst do
+               for z in lst do
+               if x + y + z = 2020 then yield (x * y * z)]
+    res.Head
+
 let part2 nums =
-    let lst = searchSumSz 3 nums
-    printfn "Part2: %d" (List.reduce ( * ) lst)
+    printfn "Part2: %d" (sumOf3 nums)
 
 let nums = getData filename |> parse
 
