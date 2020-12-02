@@ -30,7 +30,7 @@ let checkPasswd (rule, passw) =
 
 let part1 lines =
     let correct =
-        parse lines
+        lines
         |> List.filter checkPasswd
         |> List.length
     
@@ -43,13 +43,13 @@ let checkPasswd2 ((rule, passw): Rule * string) =
 
 let part2 lines =
     let correct =
-        parse lines
+        lines
         |> List.filter checkPasswd2
         |> List.length
 
     printfn "Part2: %d" correct
 
-let lines = getData filename
+let lines = getData filename |> parse
 
 part1 lines
 part2 lines
