@@ -25,7 +25,7 @@ let rec ride width col skipRow skipCol (rows : bool [] list) hit =
         if (List.length rows > skipRow) then
             ride width nuCol skipRow skipCol (List.skip skipRow tl) nuHit
         else
-            ride width nuCol skipRow skipCol [] nuHit
+            nuHit
 
 let strategy right down map =
     ride (Array.length (List.head map)) -right (down - 1) right map 0UL
