@@ -30,11 +30,8 @@ let rec ride width col skipRow skipCol (rows : bool [] list) hit =
 let strategy right down map =
     ride (Array.length (List.head map)) -right (down - 1) right map 0UL
 
-let searchTrees map =
-    strategy 3 1 map
-
 let part1 map = 
-    printfn "Part1: %d" (searchTrees map)
+    printfn "Part1: %d" (strategy 3 1 map)
 
 let part2 map =
     let strategies = [(1,1); (3,1); (5,1); (7,1); (1,2)]
