@@ -36,13 +36,26 @@ let findSeat bsp =
 let seatId (row, col) =
     row * 8 + col
 
-let part1 bps =
-    (List.map (findSeat >> seatId) bps)
+let part1 bpss =
+    List.map (findSeat >> seatId) bpss
     |> List.reduce max
     |> printfn "Part1: %d"
 
-let boardingpasses = getData filename 
+let searchEmpty lst =
+    List.sort lst
+    |> List.pairwise
+    |> List.filter (fun (x,y) -> (x+1) <> y)
+    |> List.tryHead
+    |> Option.bind (fun (x,_) -> Some (x + 1))
+
+let part2 bpss =
+    List.map (findSeat >> seatId) bpss
+    |> searchEmpty
+    |> Option.get
+    |> printfn "Part2: %d"
+
+let bpss = getData filename 
 
 
-//part1 
-//part2
+part1 bpss
+part2 bpss
