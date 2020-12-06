@@ -13,7 +13,7 @@ let rec parseGroup lns acc =
 let rec parseGroups lns cur acc =
     match lns with
     | [] when List.isEmpty cur -> acc
-    | [] -> parseGroups [] [] ((parseGroup cur [])::acc)
+    | [] -> ((parseGroup cur [])::acc)
     | (hd::tl) when hd = "" -> parseGroups tl [] ((parseGroup cur [])::acc)
     | (hd::tl) -> parseGroups tl (hd::cur) acc
 
