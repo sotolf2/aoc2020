@@ -21,12 +21,12 @@ let parse lns =
     parseGroups lns [] []
 
 let part1 frms =
-    List.map (List.fold Set.union Set.empty) frms
+    List.map Set.unionMany frms
     |> List.sumBy Set.count 
     |> printfn "Part1: %d"
 
 let part2 frms =
-    List.map (Set.intersectMany) frms
+    List.map Set.intersectMany frms
     |> List.sumBy Set.count
     |> printfn "Part2: %d"
 
