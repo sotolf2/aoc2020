@@ -19,16 +19,39 @@ let parse lns =
     |> Array.ofList
 
 let rec run (prog: Op []) ip akk seen =
-    printfn "ip: %d" ip
-    printfn "akk: %d" akk
-    printfn "op: %A" prog.[ip]
-    printfn "seen: %A" seen
-    if Set.contains ip seen then akk else
+    if Set.contains ip seen then (akk, false) else
+    if ip = Array.length prog then (akk, true) else
+    if ip > Array.length prog then (0, false) else
     match prog.[ip] with
     | NOP _ -> run prog (ip + 1) akk (Set.add ip seen)
     | ACC x -> run prog (ip + 1) (akk + x) (Set.add ip seen)
     | JMP x -> run prog (ip + x) akk (Set.add ip seen)
 
-
 let execute prog =
     run prog 0 0 Set.empty
+
+let part1 code =
+    execute code
+    |> fst
+    |> printfn "Part1: %d"
+
+let code = getData filename |> parse
+
+let rec fixcode (code: Op []) ip =
+    if ip > Array.length code then 0 else
+    let nuCode = match code.[ip] with
+                    | NOP x -> Array.mapi (fun i elm -> if i = ip then (JMP x) else elm) code 
+                    | JMP x -> Array.mapi (fun i elm -> if i = ip then (NOP x) else elm) code 
+                    | _ -> code
+    
+    let res = execute nuCode
+
+    if snd res then fst res else
+    fixcode code (ip + 1)
+
+let part2 code =
+    fixcode code 0
+    |> printfn "Part2: %d"     
+
+part1 code
+part2 code
