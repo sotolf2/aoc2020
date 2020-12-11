@@ -96,10 +96,12 @@ let part1 state =
     |> countOccupied
     |> printfn "Part1: %d"     
 
-
 let part2 state =
     getStable state LOS
     |> countOccupied
     |> printfn "Part2: %d"
 
 let startstate = getData filename |> parse
+
+part1 startstate
+part2 startstate
