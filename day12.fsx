@@ -32,6 +32,9 @@ let parseLine (ln: string) =
     let number = ln.Substring(1) |> int
     toAction letter number
 
+let parse lns =
+    List.map parseLine lns
+
 let modulo n m = ((n % m) + m) % m
 
 let turn dir amount fac =
@@ -65,13 +68,57 @@ let rec follow acts st =
     | [] -> st
     | (hd::tl) -> follow tl (move hd st)
 
-let parse lns =
-    List.map parseLine lns
-
 let part1 nav =
     follow nav (Facing.East, (0, 0))
     |> snd
     |> (fun (row, col) -> (abs row) + (abs col))
     |> printfn "Part1: %d"
 
+let addp (row, col) (row2, col2) =
+    ((row + row2), (col + col2))
+
+let rec rotL times wrow wcol row col =
+    if times = 0 then ((wrow, wcol), (row, col)) else
+    rotL (times - 1) wcol -wrow row col
+
+let rotateLeft deg ((wrow, wcol), (row, col)) =
+    let times = modulo (deg / 90) 4
+    rotL times wrow wcol row col 
+
+let rec rotR times wrow wcol row col =
+    if times = 0 then ((wrow, wcol), (row, col)) else
+    rotR (times - 1) -wcol wrow row col
+
+let rotateRight deg ((wrow, wcol), (row, col)) =
+    let times = modulo (deg / 90) 4
+    rotR times wrow wcol row col
+
+let rec goto n (wpt, boat) =
+    if n = 0 then (wpt, boat) else
+    goto (n - 1) (wpt, (addp boat wpt))
+
+let waypoint act ((wrow, wcol), (row, col)) =
+    match act with
+    | North(n) -> ((wrow + n), wcol), (row, col)
+    | South(n) -> ((wrow - n), wcol), (row, col)
+    | East(n) -> ((wrow, (wcol + n)), (row, col))
+    | West(n) -> ((wrow, (wcol - n)), (row, col))
+    | Left(n) -> rotateLeft n ((wrow, wcol), (row, col))
+    | Right(n) -> rotateRight n ((wrow, wcol), (row, col))
+    | Forward(n) -> goto n ((wrow, wcol), (row, col))
+
+let rec follow2 acts st =
+    match acts with
+    | [] -> st
+    | (hd::tl) -> follow2 tl (waypoint hd st)
+
+let part2 nav =
+    follow2 nav ((1, 10), (0, 0))
+    |> snd
+    |> (fun (row, col) -> (abs row) + (abs col))
+    |> printfn "Part2: %d"
+
 let navigation = getData filename |> parse 
+
+part1 navigation
+part2 navigation
