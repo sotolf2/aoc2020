@@ -7,7 +7,7 @@ let getData filename =
 let parse (lines: list<string>) =
     let arrival = uint32 (List.head lines)
     let busses = lines.[1].Split(',') 
-                |> Array.filter (fun x -> not <| (x = "x")) 
+                |> Array.filter (fun x -> x <> "x") 
                 |> Array.map uint32 
                 |> List.ofArray
 
@@ -29,5 +29,6 @@ let part1 (arrival, busses) =
     |> (fun (bId, time) -> (time - arrival) * bId)
     |> printfn "Part1: %d"
 
-let data = getData filename |> parse
-part1 data
+let timetable = getData filename |> parse
+part1 timetable
+
