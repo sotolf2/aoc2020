@@ -2,8 +2,8 @@ let filename = "day16.txt"
 
 type Field = {
     Label: string
-    Range1: (int*int)
-    Range2: (int*int)
+    Range1: int list
+    Range2: int list
 }
 
 let getData filename = 
@@ -24,8 +24,8 @@ let parseField (ln: string) =
     let range2 = Array.map int (ranges.[3].Split('-'))
     {
         Label = labelRanges.[0]
-        Range1 = (range1.[0], range1.[1])
-        Range2 = (range2.[0], range2.[1])
+        Range1 = [range1.[0]..range1.[1]]
+        Range2 = [range2.[0]..range2.[1]]
     }
 
 let parseMyTicket (lns: string list) =
@@ -47,10 +47,8 @@ let rec setOfnumbers fields numSet =
     match fields with
     | [] -> numSet
     | (hd::tl) ->
-        let (r1f, r1t) = hd.Range1
-        let (r2f, r2t) = hd.Range2
-        let setWithR1 = List.fold (fun st x -> Set.add x st) numSet [r1f..r1t]
-        let setWithR1R2 = List.fold (fun st x -> Set.add x st) setWithR1 [r2f..r2t]
+        let setWithR1 = List.fold (fun st x -> Set.add x st) numSet hd.Range1
+        let setWithR1R2 = List.fold (fun st x -> Set.add x st) setWithR1 hd.Range2
         setOfnumbers tl setWithR1R2
 
 let part1 fields tickets =
@@ -60,6 +58,54 @@ let part1 fields tickets =
     |> List.sum
     |> printfn "Part1: %d"
 
+let isValidTicket validNums ticket =
+    not <| List.exists (fun valu -> not <| Set.contains valu validNums) ticket
+
+let isValidCandidate field valu =
+    List.contains valu field.Range1 || List.contains valu field.Range2
+
+let trimImpossibleFields valu candidates =
+    List.filter (fun cand -> isValidCandidate cand valu) candidates
+
+let rec possibleFields tickets candidates =
+    match tickets with
+    | [] -> candidates
+    | (hd::tl) ->
+        let nuCandidates = List.map2 trimImpossibleFields hd candidates
+        possibleFields tl nuCandidates
+
+let getDeduced fieldlists =
+    List.filter (fun x -> List.length x = 1) fieldlists 
+    |> List.map List.head
+
+let rec deduceFields candList =
+    if List.exists (fun x -> (List.length x) > 1) candList then
+        let deduced = getDeduced candList
+        deduceFields (List.map (fun x ->
+                                if List.length x = 1 then x
+                                else List.filter (fun y ->
+                                                    not <| List.contains y deduced) x) candList)
+    else
+        List.map List.head candList
+        
+
+let part2 fields myTicket nearbyTickets =
+    let validNums = setOfnumbers fields Set.empty 
+    let ticketChecker = isValidTicket validNums 
+    let validTickets = List.filter ticketChecker nearbyTickets
+    let candidates = List.head validTickets
+                     |> List.map (fun _ -> fields)
+    let prepared = possibleFields validTickets candidates
+    let fieldOrder = deduceFields prepared 
+                     |> List.map (fun x -> x.Label) 
+    List.zip fieldOrder myTicket
+    |> List.filter (fun (label,_) -> label.StartsWith("departure"))
+    |> List.map (snd >> uint64)
+    |> List.reduce ( * )
+    |> printfn "Part2: %d"
+
+
 let (fields, myTicket, nearbyTickets) = getData filename |> parse
 
 part1 fields nearbyTickets
+part2 fields myTicket nearbyTickets
