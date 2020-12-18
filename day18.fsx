@@ -58,7 +58,6 @@ let rec toRPN' tokens output stack =
         | CloseGroup ->
             toRPN' tl (List.append before output) (List.tail after)
 
-// 1 + ( 2 * ( 3 + 4 ) + 5) -> 1 2 3 4 + * 5 +
 let toRPN tokens =
     toRPN' tokens [] []
 
